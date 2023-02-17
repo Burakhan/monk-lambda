@@ -1,0 +1,6 @@
+namespace: lambda
+
+my-function:
+  defines: lambda/aws-lambda
+  name: myFunction
+  region: eu-north-1

@@ -1,0 +1,49 @@
+namespace: lambda
+
+aws-lambda:
+  defines: entity
+  schema:
+    required: [ "name", "region" ]
+    name:
+      type: string
+    region:
+      type: string
+  requires:
+    - cloud/aws
+  lifecycle:
+    createx: |
+      var cli = require("cli")
+      cli.output("cretaing lambda function")
+      console.log("cretaing lambda function")
+      createLambdaFunction = function(name, region) {
+        cli.output("createLambdaFunction")
+        console.log(name);
+        console.log(region);
+        data = {
+          "service": "lambda",
+          "region": region,
+          "action": "CreateFunction",
+          "Version": "2015-03-31",
+          "Role": "arn:aws:iam::123456789012:role/lambda_basic_execution",
+          "body": {
+            "FunctionName": name,
+            "Runtime": "nodejs12.x",
+            "Handler": "index.handler",
+            "Code": {
+              "ZipFile": "exports.handler = function(event, context, callback) { callback(null, 'Hello World'); };"
+            },
+            "Description": "Lambda function created by the AWS Lambda service.",
+            "Timeout": 3,
+            "MemorySize": 128,
+            "Publish": true
+          }
+        }
+        console.log(JSON.stringify(data))
+        return aws.post("https://lambda."+region+".amazonaws.com/2015-03-31/functions/", data)
+      }
+
+      function main(definition, state, context) {
+        res = createLambdaFunction(definition.name, definition.region)
+        console.log(JSON.stringify(res))
+        cli.output("cretaing lambda function")
+      }
